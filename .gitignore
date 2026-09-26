@@ -1,0 +1,22 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit
+.streamlit/
+
+# Results and data exports (allow sample data)
+results/*.json
+results/*.csv
+!data/sample_portfolio.csv
+
+# OS and IDE
+.DS_Store
+.vscode/
+.idea/
