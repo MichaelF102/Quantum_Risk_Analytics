@@ -3,7 +3,14 @@ Page 1: Portfolio Construction & Optimization Analysis
 """
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    sys.modules["app"].__path__ = [app_dir]
 
 import streamlit as st
 import numpy as np
@@ -11,16 +18,29 @@ import pandas as pd
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
-from app.state import initialize_app_theme, get_shared_sidebar_inputs
-from app.components.charts import (
-    plot_allocation_donut,
-    plot_cumulative_returns,
-    plot_rolling_volatility,
-    plot_correlation_heatmap,
-    get_terminal_layout
-)
-from app.components.metrics import render_terminal_kpi
-from app.components.explanations import explain_portfolio_return
+try:
+    from app.state import initialize_app_theme, get_shared_sidebar_inputs
+    from app.components.charts import (
+        plot_allocation_donut,
+        plot_cumulative_returns,
+        plot_rolling_volatility,
+        plot_correlation_heatmap,
+        get_terminal_layout
+    )
+    from app.components.metrics import render_terminal_kpi
+    from app.components.explanations import explain_portfolio_return
+except (ModuleNotFoundError, ImportError):
+    from state import initialize_app_theme, get_shared_sidebar_inputs
+    from components.charts import (
+        plot_allocation_donut,
+        plot_cumulative_returns,
+        plot_rolling_volatility,
+        plot_correlation_heatmap,
+        get_terminal_layout
+    )
+    from components.metrics import render_terminal_kpi
+    from components.explanations import explain_portfolio_return
+
 from src.data.preprocessing import calculate_rolling_volatility
 from src.portfolio.portfolio import Portfolio
 

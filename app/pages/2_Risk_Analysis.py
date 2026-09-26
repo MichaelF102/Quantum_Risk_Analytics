@@ -3,16 +3,30 @@ Page 2: Comprehensive Risk Analysis - Historical, Parametric, and Monte Carlo
 """
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    sys.modules["app"].__path__ = [app_dir]
 
 import streamlit as st
 import numpy as np
 import pandas as pd
 
-from app.state import initialize_app_theme, get_shared_sidebar_inputs
-from app.components.charts import plot_loss_distribution_with_tail
-from app.components.metrics import render_terminal_kpi
-from app.components.explanations import explain_var, explain_cvar
+try:
+    from app.state import initialize_app_theme, get_shared_sidebar_inputs
+    from app.components.charts import plot_loss_distribution_with_tail
+    from app.components.metrics import render_terminal_kpi
+    from app.components.explanations import explain_var, explain_cvar
+except (ModuleNotFoundError, ImportError):
+    from state import initialize_app_theme, get_shared_sidebar_inputs
+    from components.charts import plot_loss_distribution_with_tail
+    from components.metrics import render_terminal_kpi
+    from components.explanations import explain_var, explain_cvar
+
 from src.classical.historical_simulation import run_historical_simulation
 from src.classical.parametric_var import compute_parametric_normal_risk, compute_parametric_student_t_risk
 from src.classical.monte_carlo import MonteCarloEngine

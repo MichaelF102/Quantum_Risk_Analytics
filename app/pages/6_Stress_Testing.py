@@ -3,16 +3,28 @@ Page 6: Stress Testing & Advanced Volatility Extensions (GARCH / EGARCH)
 """
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    sys.modules["app"].__path__ = [app_dir]
 
 import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-from app.state import initialize_app_theme, get_shared_sidebar_inputs
-from app.components.charts import plot_stress_test_comparison, get_terminal_layout
-from app.components.metrics import render_terminal_kpi
+try:
+    from app.state import initialize_app_theme, get_shared_sidebar_inputs
+    from app.components.charts import plot_stress_test_comparison, get_terminal_layout
+    from app.components.metrics import render_terminal_kpi
+except (ModuleNotFoundError, ImportError):
+    from state import initialize_app_theme, get_shared_sidebar_inputs
+    from components.charts import plot_stress_test_comparison, get_terminal_layout
+    from components.metrics import render_terminal_kpi
 from src.classical.monte_carlo import MonteCarloEngine
 from src.models.garch import fit_garch
 from src.models.egarch import fit_egarch

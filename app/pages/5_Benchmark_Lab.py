@@ -3,21 +3,38 @@ Page 5: Benchmark Lab - Empirical Head-to-Head Comparison & Experiments
 """
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    sys.modules["app"].__path__ = [app_dir]
 
 import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-from app.state import initialize_app_theme, get_shared_sidebar_inputs
-from app.components.tables import render_benchmark_comparison_table
-from app.components.charts import (
-    plot_convergence_curves,
-    plot_scalability_resources,
-    get_terminal_layout
-)
-from app.components.metrics import render_terminal_kpi, render_status_pill
+try:
+    from app.state import initialize_app_theme, get_shared_sidebar_inputs
+    from app.components.tables import render_benchmark_comparison_table
+    from app.components.charts import (
+        plot_convergence_curves,
+        plot_scalability_resources,
+        get_terminal_layout
+    )
+    from app.components.metrics import render_terminal_kpi, render_status_pill
+except (ModuleNotFoundError, ImportError):
+    from state import initialize_app_theme, get_shared_sidebar_inputs
+    from components.tables import render_benchmark_comparison_table
+    from components.charts import (
+        plot_convergence_curves,
+        plot_scalability_resources,
+        get_terminal_layout
+    )
+    from components.metrics import render_terminal_kpi, render_status_pill
 from src.classical.monte_carlo import MonteCarloEngine
 from src.quantum.state_preparation import LossDistributionDiscretizer
 from src.quantum.quantum_var import QuantumVaREstimator

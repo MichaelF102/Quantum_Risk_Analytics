@@ -3,17 +3,35 @@ Quantum Risk Analytics Engine - Home / Research Overview Dashboard
 """
 import sys
 import os
-# Ensure root directory is in sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Ensure root directory and app directory are in sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+app_dir = os.path.abspath(os.path.dirname(__file__))
+
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+
+# If Streamlit registered app.py as module 'app', grant it package __path__ so app.state imports resolve
+if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
+    sys.modules["app"].__path__ = [app_dir]
 
 import streamlit as st
 import numpy as np
 import pandas as pd
 
-from app.state import initialize_app_theme, get_shared_sidebar_inputs
-from app.components.metrics import render_terminal_kpi, render_status_pill
-from app.components.charts import plot_cumulative_returns, plot_allocation_donut
-from app.components.explanations import explain_var, explain_cvar, explain_amplitude_estimation
+try:
+    from app.state import initialize_app_theme, get_shared_sidebar_inputs
+    from app.components.metrics import render_terminal_kpi, render_status_pill
+    from app.components.charts import plot_cumulative_returns, plot_allocation_donut
+    from app.components.explanations import explain_var, explain_cvar, explain_amplitude_estimation
+except (ModuleNotFoundError, ImportError):
+    from state import initialize_app_theme, get_shared_sidebar_inputs
+    from components.metrics import render_terminal_kpi, render_status_pill
+    from components.charts import plot_cumulative_returns, plot_allocation_donut
+    from components.explanations import explain_var, explain_cvar, explain_amplitude_estimation
+
 from src.classical.var import compute_var_from_returns
 from src.classical.cvar import compute_cvar_from_returns
 
