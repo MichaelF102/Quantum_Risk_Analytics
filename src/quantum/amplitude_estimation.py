@@ -22,6 +22,10 @@ from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+# Standard universal basis gates supported natively by AerSimulator C++ engine
+# Excluding 'multiplexer' avoids known OpenMP/C++ extension crash with StatePreparation.inverse()
+SAFE_BASIS_GATES = ["u", "p", "rx", "ry", "rz", "h", "cx", "sx", "x", "z", "measure"]
+
 
 class QuantumAmplitudeEstimator:
     """
@@ -85,8 +89,8 @@ class QuantumAmplitudeEstimator:
             qc.measure(objective_qubit, 0)
             max_circuit_depth = max(max_circuit_depth, qc.depth())
             
-            # Transpile circuit to native Aer basis gates
-            transpiled_qc = transpile(qc, self.aer_sim, optimization_level=1)
+            # Transpile circuit to native Aer basis gates avoiding unsupported C++ multiplexer structures
+            transpiled_qc = transpile(qc, basis_gates=SAFE_BASIS_GATES, optimization_level=1)
             # Execute on Aer
             result = self.aer_sim.run(transpiled_qc, shots=shots_per_circuit, seed_simulator=self.seed).result()
             counts = result.get_counts()
@@ -192,7 +196,7 @@ class QuantumAmplitudeEstimator:
         qc.measure(eval_qubits, list(range(m)))
         
         circuit_depth = qc.depth()
-        transpiled_qc = transpile(qc, self.aer_sim, optimization_level=1)
+        transpiled_qc = transpile(qc, basis_gates=SAFE_BASIS_GATES, optimization_level=1)
         result = self.aer_sim.run(transpiled_qc, shots=shots, seed_simulator=self.seed).result()
         counts = result.get_counts()
         

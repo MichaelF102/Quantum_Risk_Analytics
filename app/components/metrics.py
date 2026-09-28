@@ -16,35 +16,28 @@ def render_terminal_kpi(
     """
     Render a sleek, dark-terminal styled KPI card.
     """
-    badge_html = ""
-    if badge:
-        badge_html = f"<span style='background-color:#21262d; color:#58a6ff; font-family:monospace; font-size:10px; padding:2px 6px; border-radius:3px; border:1px solid #30363d; margin-left:6px;'>{badge}</span>"
+    badge_html = f"<span style='background-color:#21262d; color:#58a6ff; font-family:monospace; font-size:10px; padding:2px 6px; border-radius:3px; border:1px solid #30363d; margin-left:6px;'>{badge}</span>" if badge else ""
         
-    delta_html = ""
     if delta:
         color = "#3fb950" if delta_color == "green" else ("#f85149" if delta_color == "red" else "#8b949e")
         delta_html = f"<div style='font-family:monospace; font-size:12px; color:{color}; margin-top:4px;'>{delta}</div>"
+    else:
+        delta_html = ""
         
-    sublabel_html = ""
-    if sublabel:
-        sublabel_html = f"<div style='font-family:monospace; font-size:10px; color:#8b949e; margin-top:3px;'>{sublabel}</div>"
+    sublabel_html = f"<div style='font-family:monospace; font-size:10px; color:#8b949e; margin-top:3px;'>{sublabel}</div>" if sublabel else ""
 
-    card_html = f"""
-    <div style='background-color:#161b22; border:1px solid #30363d; border-radius:6px; padding:12px 16px; margin-bottom:10px;'>
-        <div style='display:flex; justify-content:space-between; align-items:center;'>
-            <div style='font-family:monospace; font-size:11px; text-transform:uppercase; color:#8b949e; letter-spacing:0.5px;'>
-                {label}
-            </div>
-            {badge_html}
-        </div>
-        <div style='font-family:monospace; font-size:22px; font-weight:700; color:#f0f6fc; margin-top:6px; letter-spacing:-0.5px;'>
-            {value}
-        </div>
-        {delta_html}
-        {sublabel_html}
-    </div>
-    """
-    st.markdown(card_html, unsafe_allow_html=True)
+    card_html = (
+        f"<div style='background-color:#161b22; border:1px solid #30363d; border-radius:6px; padding:12px 16px; margin-bottom:10px;'>"
+        f"<div style='display:flex; justify-content:space-between; align-items:center;'>"
+        f"<div style='font-family:monospace; font-size:11px; text-transform:uppercase; color:#8b949e; letter-spacing:0.5px;'>{label}</div>"
+        f"{badge_html}"
+        f"</div>"
+        f"<div style='font-family:monospace; font-size:22px; font-weight:700; color:#f0f6fc; margin-top:6px; letter-spacing:-0.5px;'>{value}</div>"
+        f"{delta_html}"
+        f"{sublabel_html}"
+        f"</div>"
+    )
+    st.html(card_html)
 
 
 def render_status_pill(status: str, mode: str = "SIMULATED") -> None:
@@ -57,9 +50,9 @@ def render_status_pill(status: str, mode: str = "SIMULATED") -> None:
     }
     bg, fg = color_map.get(mode.upper(), ("#30363d", "#c9d1d9"))
     
-    html = f"""
-    <div style='display:inline-block; font-family:monospace; font-size:11px; padding:3px 8px; border-radius:4px; background-color:{bg}33; border:1px solid {bg}; color:{fg}; margin-bottom:8px;'>
-        STATUS: <strong>{mode.upper()}</strong> | {status}
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    html = (
+        f"<div style='display:inline-block; font-family:monospace; font-size:11px; padding:3px 8px; border-radius:4px; background-color:{bg}33; border:1px solid {bg}; color:{fg}; margin-bottom:8px;'>"
+        f"STATUS: <strong>{mode.upper()}</strong> | {status}"
+        f"</div>"
+    )
+    st.html(html)

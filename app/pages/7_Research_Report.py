@@ -13,7 +13,29 @@ if app_dir not in sys.path:
 if "app" in sys.modules and not hasattr(sys.modules["app"], "__path__"):
     sys.modules["app"].__path__ = [app_dir]
 
+import importlib
+for _mod_name in [
+    "app.components.metrics", "components.metrics",
+    "app.state", "state",
+    "app.components.charts", "components.charts",
+    "app.components.tables", "components.tables",
+    "app.components.explanations", "components.explanations"
+]:
+    if _mod_name in sys.modules:
+        try:
+            importlib.reload(sys.modules[_mod_name])
+        except Exception:
+            pass
+
 import streamlit as st
+
+st.set_page_config(
+    page_title="Research Report | Quantum Risk Terminal",
+    page_icon="⚛",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import numpy as np
 import pandas as pd
 
@@ -39,12 +61,12 @@ mc_sims = inputs["mc_sims"]
 num_qubits = inputs["num_qubits"]
 seed = inputs["seed"]
 
-st.markdown("""
+st.html("""
 <div style='border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;'>
-    <h2 style='margin:0; font-family:monospace; color:#f0f6fc;'>// 07_ACADEMIC_RESEARCH_REPORT</h2>
+    <h2 style='margin:0; font-family:monospace; color:#f0f6fc;'>07. ACADEMIC RESEARCH REPORT</h2>
     <div style='font-family:monospace; font-size:12px; color:#58a6ff;'>Automated Research Synthesis, Empirical Audit Trail, and Reproducible Results Export</div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # Generate active experimental numbers
 mc_engine = MonteCarloEngine(
@@ -117,7 +139,8 @@ with col_exp1:
         data=json.dumps(report_dict, indent=2),
         file_name=f"quantum_risk_experiment_{seed}.json",
         mime="application/json",
-        use_container_width=True
+        width="stretch",
+        key="btn_download_json"
     )
 
 with col_exp2:
@@ -138,11 +161,12 @@ with col_exp2:
         data=exp_summary_df.to_csv(index=False),
         file_name=f"quantum_risk_metrics_{seed}.csv",
         mime="text/csv",
-        use_container_width=True
+        width="stretch",
+        key="btn_download_csv"
     )
 
 with col_exp3:
-    st.markdown(f"<div style='font-family:monospace; font-size:11px; color:#8b949e; padding-top:8px;'>ENVIRONMENT: Python {env_meta['python_version']} // Qiskit {env_meta['qiskit_version']}</div>", unsafe_allow_html=True)
+    st.html(f"<div style='font-family:monospace; font-size:11px; color:#8b949e; padding-top:8px;'>ENVIRONMENT: Python {env_meta['python_version']} • Qiskit {env_meta['qiskit_version']}</div>")
 
 st.markdown("---")
 
@@ -172,12 +196,12 @@ Specifically, it benchmarks **Quantum Amplitude Estimation (QAE)** against high-
 ### 3. Methodology & Mathematical Framework
 1. **Classical Monte Carlo**:
    Generates `{mc_sims:,}` correlated price paths using vectorized Cholesky decomposition:
-   $$S_i(T) = S_i(0) \\exp\\left( (\\mu_i - \\frac{1}{2}\\sigma_i^2)T + \\sqrt{T}(LZ)_i \\right)$$
+   $$S_i(T) = S_i(0) \\exp\\left( (\\mu_i - \\frac{{1}}{{2}}\\sigma_i^2)T + \\sqrt{{T}}(LZ)_i \\right)$$
    Standard error scales at the Central Limit Theorem rate:
    $$\\epsilon_{{MC}} = \\mathcal{{O}}\\left(\\frac{{1}}{{\\sqrt{{N}}}}\\right)$$
 
 2. **Quantum Amplitude Estimation**:
-   Discretizes the portfolio loss distribution into $2^{{{num_qubits}}} = {2**num_qubits}$ quantum basis states.
+   Discretizes the portfolio loss distribution into $2^{num_qubits} = {2**num_qubits}$ quantum basis states.
    Applies a quantum boolean risk comparator oracle marking basis states where $L \\ge T$.
    Uses Maximum Likelihood Amplitude Estimation (MLQAE) over Grover powers to achieve asymptotic quadratic scaling:
    $$\\epsilon_{{QAE}} = \\mathcal{{O}}\\left(\\frac{{1}}{{M}}\\right)$$

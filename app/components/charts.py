@@ -27,7 +27,7 @@ def get_terminal_layout(title: str = "", height: int = 420) -> dict:
     """Standard layout for dark terminal styling."""
     return dict(
         title=dict(
-            text=f"<span style='color:{ACCENT_BLUE}; font-family:monospace; font-size:14px;'>// {title.upper()}</span>",
+            text=f"<span style='color:{ACCENT_BLUE}; font-family:monospace; font-size:14px;'>{title.upper()}</span>",
             x=0.01,
             y=0.96
         ),
@@ -116,6 +116,31 @@ def plot_rolling_volatility(rolling_vol: pd.DataFrame) -> go.Figure:
     layout["yaxis"]["ticksuffix"] = "%"
     fig.update_layout(**layout)
     return fig
+
+
+def plot_risk_decomposition(assets: List[str], risk_contributions: np.ndarray, height: int = 240) -> go.Figure:
+    """Plot asset percentage contribution to portfolio risk."""
+    colors = ["#2dd4bf", "#0284c7", "#f59e0b", "#3b82f6", "#ec4899", "#8b5cf6", "#10b981", "#f97316"]
+    fig = go.Figure(data=[
+        go.Bar(
+            x=assets,
+            y=risk_contributions,
+            marker=dict(
+                color=[colors[i % len(colors)] for i in range(len(assets))],
+                line=dict(color="#161b22", width=1)
+            ),
+            text=[f"{v:.1f}%" for v in risk_contributions],
+            textposition="auto",
+            hoverinfo="x+y"
+        )
+    ])
+    layout = get_terminal_layout("Diagnostic View: Portfolio Risk Decomposition", height=height)
+    layout["yaxis"]["title"] = "Contribution to risk"
+    layout["yaxis"]["ticksuffix"] = "%"
+    layout["margin"] = dict(l=40, r=15, t=35, b=30)
+    fig.update_layout(**layout)
+    return fig
+
 
 
 def plot_correlation_heatmap(corr_df: pd.DataFrame) -> go.Figure:

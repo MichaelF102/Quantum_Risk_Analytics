@@ -10,3 +10,4 @@ plotly>=5.18.0
 matplotlib>=3.8.0
 pytest>=8.0.0
 arch>=6.2.0
+yfinance>=1.7.0
